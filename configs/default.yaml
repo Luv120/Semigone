@@ -1,0 +1,34 @@
+# NAFNet-Tiny for Semiconductor Image Restoration
+# Team Semigone - Semicon India Hackathon
+
+model:
+  name: nafnet_tiny
+  img_channel: 1
+  width: 16
+  enc_blk_nums: [1, 1, 1, 2]
+  middle_blk_num: 1
+  dec_blk_nums: [1, 1, 1, 1]
+  scale: 2
+
+loss:
+  charbonnier_weight: 1.0
+  charbonnier_eps: 1.0e-3
+  ssim_weight: 0.1
+
+training:
+  batch_size: 8
+  lr_patch_size: 64
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  scheduler: cosine
+  warmup_iters: 500
+  max_iters: 15000
+  val_interval: 500
+  save_interval: 1000
+  num_workers: 2
+
+data:
+  train_degraded: Train/Degraded
+  train_gt: Train/Ground_Truth
+  test_in_dist: Test/Test_NoisyLR/In_Distribution
+  test_ood: Test/Test_NoisyLR/Out_of_Distribution

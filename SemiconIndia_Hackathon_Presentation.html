@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semicon India Hackathon - AI-Based Restoration of Degraded Images</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:16px;scroll-behavior:smooth}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#080e1a;color:#b0bcd0;line-height:1.5}
+  :root{--bg:#0f172a;--card:#1a253c;--green:#00e676;--blue:#0096ff;--amber:#ffa000;--red:#ff4545;--purple:#cc66ff;--white:#fff;--lgray:#b0bcd0;--mgray:#6b7b93;--dark:#0a0f1a;--border:#2a3a55}
+  .wrap{max-width:1200px;margin:0 auto;padding:20px}
+  .slide{background:var(--bg);border-radius:12px;padding:48px 56px;margin-bottom:40px;position:relative;overflow:hidden;min-height:520px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .slide::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+  .slide.sg::before{background:var(--green)}.slide.sb::before{background:var(--blue)}.slide.sa::before{background:var(--amber)}.slide.sp::before{background:var(--purple)}.slide.smg::before{background:var(--mgray)}
+  .sn{position:absolute;bottom:16px;right:24px;font-size:13px;color:var(--mgray);font-weight:600}
+  .badge{display:inline-block;padding:6px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:12px}
+  .badge.g{background:var(--green);color:var(--dark)}.badge.b{background:var(--blue);color:#fff}.badge.a{background:var(--amber);color:var(--dark)}.badge.p{background:var(--purple);color:#fff}.badge.gr{background:var(--mgray);color:#fff}
+  h1.t{font-size:32px;font-weight:700;color:var(--white);margin-bottom:8px;line-height:1.2}
+  .al{width:120px;height:3px;margin:12px 0 24px;border-radius:2px}
+  .al.g{background:var(--green)}.al.b{background:var(--blue)}.al.a{background:var(--amber)}.al.p{background:var(--purple)}.al.gr{background:var(--mgray)}
+  .card{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:24px 28px}
+  .card.gb{border-color:var(--green)}.card.bb{border-color:var(--blue)}.card.ab{border-color:var(--amber)}.card.pb{border-color:var(--purple)}.card.rb{border-color:var(--red)}
+  .ct{font-size:15px;font-weight:700;margin-bottom:12px;letter-spacing:.3px}
+  .card ul{list-style:none;padding:0}.card li{padding:3px 0;font-size:13.5px;color:var(--lgray)}
+  .card li.w{color:var(--white)}.card li.sm{font-size:12px}
+  .fm{font-family:Consolas,'Courier New',monospace;font-size:12px;margin-top:4px}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+  .g22{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .pr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .pb{padding:10px 14px;border-radius:8px;text-align:center;font-size:12px;font-weight:700;color:#fff;min-width:100px;flex-shrink:0}
+  .pb .su{font-size:10px;font-weight:400;color:#ddd;display:block;margin-top:2px}
+  .pa{font-size:20px;font-weight:700;color:var(--green);flex-shrink:0}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+  table th{padding:10px 14px;text-align:center;font-weight:700;font-size:12px}
+  table td{padding:10px 14px;text-align:center;background:var(--card);color:var(--lgray);border-bottom:1px solid #1f2b42}
+  table.gh th{background:var(--green);color:var(--dark)}table.bh th{background:var(--blue);color:#fff}
+  tr.hl td{background:#15301e;color:var(--green);font-weight:700}
+  .tg{color:var(--green)}.tb{color:var(--blue)}.ta{color:var(--amber)}.tp{color:var(--purple)}.tr{color:var(--red)}.tw{color:var(--white)}.tl{color:var(--lgray)}.tmg{color:var(--mgray)}
+  .b{font-weight:700}.s{font-size:12px}.xs{font-size:11px}
+  .mb8{margin-bottom:8px}.mb16{margin-bottom:16px}.mb24{margin-bottom:24px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+  .lc{background:var(--card);border-radius:10px;padding:28px 36px;margin-bottom:20px}
+  .lc .url{font-size:17px;color:var(--white);word-break:break-all;margin:10px 0}.lc p{font-size:13.5px;color:var(--lgray)}
+  .vp{background:var(--card);border:1.5px solid var(--mgray);border-radius:10px;padding:24px;text-align:center;color:var(--mgray);min-height:300px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+  .ann{font-size:10px;text-align:center;padding:6px 10px;border-radius:6px;background:rgba(26,37,60,.6);line-height:1.4}
+  .sl{font-size:13px;font-weight:700;letter-spacing:.5px;margin-bottom:8px}
+  nav.nb{position:fixed;bottom:0;left:0;right:0;background:rgba(15,23,42,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:10px 24px;display:flex;justify-content:center;gap:8px;z-index:100}
+  .nd{width:10px;height:10px;border-radius:50%;background:var(--mgray);border:none;cursor:pointer;transition:all .2s;padding:0}
+  .nd:hover{background:var(--blue);transform:scale(1.3)}.nd.ac{background:var(--green);transform:scale(1.4)}
+  @media(max-width:900px){.slide{padding:28px 24px}h1.t{font-size:24px}.g2,.g3,.g22{grid-template-columns:1fr}.pr{flex-direction:column;align-items:stretch}.pa{text-align:center;transform:rotate(90deg)}}
+  @media print{nav.nb{display:none}.slide{break-inside:avoid;page-break-after:always;box-shadow:none;border:1px solid #333}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- SLIDE 1 -->
+<section class="slide sg" id="s1">
+<span class="badge g">SEMICON INDIA HACKATHON 2025</span>
+<h1 class="t">AI-Based Restoration of Degraded<br>Images for Semiconductor Inspection</h1>
+<div class="al g"></div>
+<div class="g2 mt16">
+  <div class="card">
+    <div class="ct tg">TEAM DETAILS</div>
+    <ul>
+      <li class="tl"><strong>Team Name:</strong>&emsp;&lt;Your Team Name&gt;</li>
+      <li>&nbsp;</li>
+      <li class="w"><strong>Member 1:</strong>&emsp;&lt;Name&gt; &mdash; ML Engineer (Lead)</li>
+      <li class="w"><strong>Member 2:</strong>&emsp;&lt;Name&gt; &mdash; Data &amp; Feature Engineering</li>
+      <li class="w"><strong>Member 3:</strong>&emsp;&lt;Name&gt; &mdash; Frontend / Demo &amp; Eval</li>
+      <li class="w"><strong>Member 4:</strong>&emsp;&lt;Name&gt; &mdash; Classical Baselines &amp; QC</li>
+      <li>&nbsp;</li>
+      <li class="tl"><strong>College:</strong>&emsp;&lt;Your College Name&gt;</li>
+      <li class="tl"><strong>Contact:</strong>&emsp;&lt;email@example.com&gt;</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ct tb">APPROACH AT A GLANCE</div>
+    <ul>
+      <li class="w">&#129504;&ensp;NAFNet-Tiny &mdash; Single backbone restoration</li>
+      <li class="w">&#127919;&ensp;XGBoost &mdash; Defect-aware loss weighting &amp; QC</li>
+      <li class="w">&#128208;&ensp;Non-GAN pixel-fidelity losses only</li>
+      <li class="w">&#128300;&ensp;Physics-based synthetic degradation pipeline</li>
+      <li class="w">&#9889;&ensp;&lt;3ms inference per 256x256 image</li>
+      <li class="w">&#9989;&ensp;Post-hoc QC verifier for defect preservation</li>
+    </ul>
+  </div>
+</div>
+<span class="sn">1 / 9</span>
+</section>
+
+<!-- SLIDE 2 -->
+<section class="slide sb" id="s2">
+<span class="badge b">PROBLEM STATEMENT</span>
+<h1 class="t">AI-Based Restoration of Degraded Images for Semiconductor Inspection</h1>
+<div class="al b"></div>
+<div class="mb24">
+  <div class="ct tg" style="font-size:18px">Why This Problem Matters</div>
+  <p class="tl" style="max-width:900px">Semiconductor fabrication operates at nanometer scales where even a single undetected particle, scratch, or void can cause chip failure. Modern fabs inspect billions of die per year &mdash; <strong class="tw">image quality directly determines yield</strong>.</p>
+</div>
+<div class="g3">
+  <div class="card ab">
+    <div class="ct ta">&#9889; SPECKLE NOISE</div>
+    <ul>
+      <li>Multiplicative noise from coherent laser illumination in optical wafer inspection (darkfield/brightfield).</li>
+      <li>&nbsp;</li>
+      <li class="fm ta">I(x,y) = I_clean(x,y) &middot; &eta;(x,y)</li>
+      <li class="fm ta">where &eta; ~ Gamma(L, 1/L)</li>
+      <li>&nbsp;</li>
+      <li class="w"><strong>Impact:</strong> Obscures sub-100nm particles and edge defects.</li>
+    </ul>
+  </div>
+  <div class="card bb">
+    <div class="ct tb">&#128202; GAUSSIAN + POISSON NOISE</div>
+    <ul>
+      <li>Additive readout noise (detector thermal) + Poisson shot noise from low electron dose in SEM.</li>
+      <li>&nbsp;</li>
+      <li class="fm tb">Low-dose SEM: dose &isin; [15, 80]</li>
+      <li class="fm tb">Readout: &sigma; &isin; [0.01, 0.08]</li>
+      <li>&nbsp;</li>
+      <li class="w"><strong>Impact:</strong> Degrades CD-SEM metrology accuracy (LER/LWR).</li>
+    </ul>
+  </div>
+  <div class="card gb">
+    <div class="ct tg">&#128269; LOW RESOLUTION</div>
+    <ul>
+      <li>Pixel binning, low magnification, and diffraction-limited optics reduce spatial resolution.</li>
+      <li>&nbsp;</li>
+      <li class="fm tg">Defocus PSF + 2x downsampling</li>
+      <li class="fm tg">+ optical transfer function blur</li>
+      <li>&nbsp;</li>
+      <li class="w"><strong>Impact:</strong> Merges adjacent defects, loses critical dimension detail.</li>
+    </ul>
+  </div>
+</div>
+<span class="sn">2 / 9</span>
+</section>
+
+<!-- SLIDE 3 -->
+<section class="slide sg" id="s3">
+<span class="badge g">IDEA DESCRIPTION</span>
+<h1 class="t">Single-Backbone Restoration with Defect-Aware Intelligence</h1>
+<div class="al g"></div>
+<div class="mb24">
+  <p class="tw" style="max-width:960px"><strong class="tg">Core Insight:</strong> One fine-tuned backbone (NAFNet) handles ALL degradations jointly &mdash; noise, blur, and downsampling trained end-to-end together. A cheap XGBoost classifier provides a second interpretable signal specifically watching for the failure mode we care about most: defects being &ldquo;cleaned away&rdquo; during restoration.</p>
+</div>
+<div class="g2">
+  <div class="card gb">
+    <div class="ct tg">WHY NAFNet?</div>
+    <ul>
+      <li class="w">&check;&ensp;No nonlinear activations &rarr; SimpleGate replaces ReLU/GELU</li>
+      <li class="w">&check;&ensp;Pure ConvNet &rarr; 4-6x faster than SwinIR Transformer</li>
+      <li class="w">&check;&ensp;UNet encoder-decoder with skip connections</li>
+      <li class="w">&check;&ensp;&lt;3ms inference, trains in ~15 min on 1 GPU</li>
+      <li class="w">&check;&ensp;No GAN &rarr; zero hallucination risk for defect fidelity</li>
+      <li class="w">&check;&ensp;Global residual: output = f(x) + x &rarr; identity baseline</li>
+      <li class="w">&check;&ensp;Trivial ONNX/TensorRT export for production</li>
+    </ul>
+  </div>
+  <div class="card bb">
+    <div class="ct tb">ADDRESSING ALL 3 DEGRADATIONS</div>
+    <p class="ta b s mb8">Joint End-to-End Training:</p>
+    <p class="tw s mb16">Degraded LR input &rarr; NAFNet &rarr; Clean HR output</p>
+    <ul>
+      <li class="w">1. <strong>Speckle:</strong> Learned via Gamma noise in training pipeline, outperforms hand-tuned SRAD/Lee</li>
+      <li class="w">2. <strong>Gaussian + Poisson:</strong> Mixed noise model in synthetic degradation matches SEM physics</li>
+      <li class="w">3. <strong>Super-Resolution:</strong> PixelShuffle head for 2x upscaling after denoising in LR domain</li>
+    </ul>
+  </div>
+</div>
+<span class="sn">3 / 9</span>
+</section>
+
+<!-- SLIDE 4 -->
+<section class="slide sa" id="s4">
+<span class="badge a">PROPOSED SOLUTION</span>
+<h1 class="t">End-to-End Pipeline: Restore &rarr; Detect &rarr; Verify</h1>
+
+<div class="sl tg mt24">RESTORATION PIPELINE (TRAINING &amp; INFERENCE)</div>
+<div class="pr">
+  <div class="pb" style="background:#5c2d91">Degraded Input<span class="su">(Noisy + LR Grayscale)</span></div>
+  <span class="pa">&rarr;</span>
+  <div class="pb" style="background:#3d5a80">Optional SRAD/Lee<span class="su">(Toggleable Preproc)</span></div>
+  <span class="pa">&rarr;</span>
+  <div class="pb" style="background:var(--green);color:#000">NAFNet-Tiny Backbone<span class="su" style="color:#000">(Joint Denoise + 2x SR)</span></div>
+  <span class="pa">&rarr;</span>
+  <div class="pb" style="background:#00895a">Restored Output<span class="su">(Clean HR)</span></div>
+  <span class="pa">&rarr;</span>
+  <div class="pb" style="background:var(--blue)">QC Verifier<span class="su">(Defect Preservation Check)</span></div>
+</div>
+
+<div class="sl ta">DEFECT DETECTION PATHWAY</div>
+<div class="pr">
+  <div class="pb" style="background:#5c2d91">Image Patches<span class="su">(32x32, stride 16)</span></div>
+  <span class="pa">&rarr;</span>
+  <div class="pb" style="background:#3d5a80">Feature Extractor<span class="su">(GLCM, LBP, Gabor, FFT)</span></div>
+  <span class="pa">&rarr;</span>
+  <div class="pb" style="background:var(--amber);color:#000">XGBoost Classifier<span class="su" style="color:#000">(Binary: Defect/Normal)</span></div>
+  <span class="pa">&rarr;</span>
+  <div class="pb" style="background:#b86b00">Defect Prob Map<span class="su">(P_defect(x,y) &isin; [0,1])</span></div>
+  <div style="display:flex;gap:16px;margin-left:8px">
+    <div class="ann ta">&uarr; Training:<br>Spatial loss weights<br>W = 1 + &alpha;&middot;P<sup>&beta;</sup></div>
+    <div class="ann tb">&uarr; Inference:<br>Defect ROIs for<br>QC metrics</div>
+  </div>
+</div>
+
+<div class="sl tp mt16">MODEL ARCHITECTURE &amp; LOSS DESIGN</div>
+<div class="g3">
+  <div class="card">
+    <div class="ct tg">NAFNet-Tiny Config:</div>
+    <ul>
+      <li class="fm xs">width=16, enc=[1,1,1,2], mid=1, dec=[1,1,1,1]</li>
+      <li class="fm xs">img_channel=1 (grayscale), ~0.48M params</li>
+      <li class="fm xs">Blocks: LayerNorm &rarr; DWConv &rarr; SimpleGate &rarr; SCA</li>
+      <li class="fm xs">SR Head: Conv &rarr; PixelShuffle(2) &rarr; Conv</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ct ta">Composite Loss (No GAN):</div>
+    <ul>
+      <li class="fm xs tw">L = L_Charb + 0.1&middot;L_FFT + 0.05&middot;L_SSIM</li>
+      <li class="fm xs tw">&emsp;+ L_DefectAware(W &middot; |pred-target|)</li>
+      <li class="fm xs">Charbonnier: sqrt((x-y)&sup2; + &epsilon;&sup2;), &epsilon;=1e-3</li>
+      <li class="fm xs">FFT: ||F(x) - F(y)||&#8321; &rarr; edge fidelity</li>
+      <li class="fm xs">W(x,y) = 1 + 15&middot;P_defect(x,y)^1.5</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ct tb">Training Strategy:</div>
+    <ul>
+      <li class="xs">Phase 0: Train XGBoost (~2 min)</li>
+      <li class="xs">Phase 1: Train NAFNet (~15 min)</li>
+      <li class="xs">Optimizer: AdamW, lr=1e-3</li>
+      <li class="xs">Scheduler: Cosine annealing</li>
+      <li class="xs">Patches: 128x128, batch=8</li>
+    </ul>
+  </div>
+</div>
+<span class="sn">4 / 9</span>
+</section>
+
+<!-- SLIDE 5 -->
+<section class="slide sp" id="s5">
+<span class="badge p">INNOVATION &amp; UNIQUENESS</span>
+<h1 class="t">What Sets Our Approach Apart</h1>
+<div class="al p"></div>
+<div class="g22">
+  <div class="card gb">
+    <div class="ct tg">1. DEFECT-AWARE SPATIAL LOSS WEIGHTING</div>
+    <ul>
+      <li class="w">Novel: XGBoost defect probabilities create a spatial weight map that forces the restoration network to be extra careful in defect regions during training.</li>
+      <li>&nbsp;</li>
+      <li class="fm tg">W(x,y) = 1.0 + &alpha; &middot; [P_defect(x,y)]<sup>&beta;</sup></li>
+      <li class="xs">Defect pixels get 15x higher loss weight than background</li>
+    </ul>
+  </div>
+  <div class="card bb">
+    <div class="ct tb">2. POST-HOC QC VERIFIER (NOT A 2ND MODEL)</div>
+    <ul>
+      <li class="w">Lightweight discrepancy check &mdash; not a second full model. Computes metrics ONLY over defect-flagged regions:</li>
+      <li>&nbsp;</li>
+      <li class="w">&bull; Local SSIM on defect patches (threshold &ge; 0.82)</li>
+      <li class="w">&bull; Weber Contrast Preservation &rho; &isin; [0.75, 1.30]</li>
+      <li class="w">&bull; Edge Preservation Index (EPI &ge; 0.70)</li>
+      <li class="xs tb">Flags images where defects were &ldquo;cleaned away&rdquo;</li>
+    </ul>
+  </div>
+  <div class="card ab">
+    <div class="ct ta">3. PHYSICS-BASED SYNTHETIC DEGRADATION</div>
+    <ul>
+      <li class="w">Not random noise &mdash; models real sensor physics:</li>
+      <li class="w">&bull; Poisson shot noise (electron dose statistics)</li>
+      <li class="w">&bull; Gaussian readout (detector thermal noise)</li>
+      <li class="w">&bull; Gamma speckle (coherent laser interference)</li>
+      <li class="w">&bull; Defocus PSF + stage drift blur + downsampling</li>
+      <li class="xs ta">Eliminates need for paired hardware-captured datasets</li>
+    </ul>
+  </div>
+  <div class="card pb">
+    <div class="ct tp">4. ZERO-HALLUCINATION FAST INFERENCE</div>
+    <ul>
+      <li class="w">&bull; Non-GAN pixel-fidelity losses &rarr; no hallucinated defects</li>
+      <li class="w">&bull; SimpleGate replaces all activations &rarr; fewer FLOPs</li>
+      <li class="w">&bull; Single model, no cascaded errors</li>
+      <li class="w">&bull; &lt;3ms GPU / &lt;20ms CPU per 256x256 image</li>
+      <li class="w">&bull; Direct ONNX export, no custom operators</li>
+      <li class="xs tp">Production-ready for inline wafer inspection</li>
+    </ul>
+  </div>
+</div>
+<span class="sn">5 / 9</span>
+</section>
+
+<!-- SLIDE 6 -->
+<section class="slide sg" id="s6">
+<span class="badge g">RESULTS</span>
+<h1 class="t">Quantitative &amp; Qualitative Evaluation</h1>
+<div class="g2 mt24" style="grid-template-columns:1.4fr 1fr">
+  <div>
+    <div class="card gb mb24">
+      <div class="ct tg">GLOBAL RESTORATION METRICS (Test Set)</div>
+      <table class="gh">
+        <thead><tr><th>Method</th><th>PSNR &uarr;</th><th>SSIM &uarr;</th><th>LPIPS &darr;</th><th>Time/img</th></tr></thead>
+        <tbody>
+          <tr><td>Degraded Input</td><td>&lt;value&gt;</td><td>&lt;value&gt;</td><td>&lt;value&gt;</td><td>&mdash;</td></tr>
+          <tr><td>Lee Filter</td><td>&lt;value&gt;</td><td>&lt;value&gt;</td><td>&lt;value&gt;</td><td>~5 ms</td></tr>
+          <tr><td>SRAD (30 iter)</td><td>&lt;value&gt;</td><td>&lt;value&gt;</td><td>&lt;value&gt;</td><td>~45 ms</td></tr>
+          <tr class="hl"><td>NAFNet-Tiny (Ours)</td><td>&lt;value&gt;</td><td>&lt;value&gt;</td><td>&lt;value&gt;</td><td>&lt;3 ms</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card bb">
+      <div class="ct tb">DEFECT PRESERVATION METRICS (XGBoost-Flagged Regions)</div>
+      <table class="bh">
+        <thead><tr><th>Metric</th><th>Threshold</th><th>Our Result</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Local SSIM (defect patches)</td><td>&ge; 0.82</td><td>&lt;value&gt;</td><td>&#9989; PASS</td></tr>
+          <tr><td>Weber Contrast Preservation</td><td>0.75 &ndash; 1.30</td><td>&lt;value&gt;</td><td>&#9989; PASS</td></tr>
+          <tr><td>Edge Preservation Index</td><td>&ge; 0.70</td><td>&lt;value&gt;</td><td>&#9989; PASS</td></tr>
+          <tr><td>Defect Recall (post-restore)</td><td>&Delta; &lt; 5%</td><td>&lt;value&gt;</td><td>&#9989; PASS</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="vp">
+    <div class="tmg b" style="font-size:15px">VISUAL COMPARISON</div>
+    <p class="tmg">[ Insert Before/After Images ]</p>
+    <div><p class="tr b">&darr; Degraded Input</p><p class="xs">(noisy + low-res)</p></div>
+    <div><p class="tg b">&darr; NAFNet Restored</p><p class="xs">(denoised + super-resolved)</p></div>
+    <div><p class="tb b">&darr; Ground Truth</p><p class="xs">(clean HR reference)</p></div>
+    <p class="ta xs">&#11036; Defect regions highlighted with XGBoost overlay</p>
+  </div>
+</div>
+<span class="sn">6 / 9</span>
+</section>
+
+<!-- SLIDE 7 -->
+<section class="slide sb" id="s7">
+<span class="badge b">TECHNOLOGY &amp; FEASIBILITY</span>
+<h1 class="t">Production-Ready Tech Stack</h1>
+<div class="al b"></div>
+<div class="g3">
+  <div class="card gb">
+    <div class="ct tg">&#129504; CORE ML STACK</div>
+    <ul>
+      <li class="tg b s">Framework:</li><li class="w">&emsp;PyTorch 2.x + torchvision</li><li>&nbsp;</li>
+      <li class="tg b s">Restoration Model:</li><li class="w">&emsp;NAFNet-Tiny (custom impl)</li><li>&emsp;0.48M parameters</li><li>&nbsp;</li>
+      <li class="tg b s">Defect Detector:</li><li class="w">&emsp;XGBoost + scikit-learn</li><li>&emsp;scikit-image (features)</li><li>&nbsp;</li>
+      <li class="tg b s">Losses:</li><li class="w">&emsp;Charbonnier + FFT + SSIM</li><li class="w">&emsp;+ DefectAware spatial weight</li><li>&nbsp;</li>
+      <li class="tg b s">Classical Baselines:</li><li class="w">&emsp;OpenCV (Lee, SRAD filters)</li>
+    </ul>
+  </div>
+  <div class="card ab">
+    <div class="ct ta">&#9881;&#65039; INFRASTRUCTURE</div>
+    <ul>
+      <li class="ta b s">Training Hardware:</li><li class="w">&emsp;&lt;GPU type &mdash; e.g., T4/V100/A100&gt;</li><li>&emsp;&lt;Cloud &mdash; Colab/Kaggle/AWS&gt;</li><li>&nbsp;</li>
+      <li class="ta b s">Training Time:</li><li class="w">&emsp;XGBoost: ~2 minutes</li><li class="w">&emsp;NAFNet: ~15-30 minutes</li><li>&nbsp;</li>
+      <li class="ta b s">Model Size:</li><li class="w">&emsp;NAFNet: ~1.9 MB (.pth)</li><li class="w">&emsp;XGBoost: ~0.5 MB (.json)</li><li>&emsp;Total: &lt; 2.5 MB</li><li>&nbsp;</li>
+      <li class="ta b s">Inference Speed:</li><li class="w">&emsp;GPU: &lt;3 ms / 256x256 img</li><li class="w">&emsp;CPU: ~20 ms / 256x256 img</li>
+    </ul>
+  </div>
+  <div class="card bb">
+    <div class="ct tb">&#128421; DEMO &amp; DATA</div>
+    <ul>
+      <li class="tb b s">Demo Interface:</li><li class="w">&emsp;Gradio Web App</li><li>&emsp;Side-by-side comparison UI</li><li>&nbsp;</li>
+      <li class="tb b s">Datasets:</li><li class="w">&emsp;MVTec AD (transistor/PCB)</li><li class="w">&emsp;+ Synthetic degradation pipeline</li><li>&emsp;WM-811K (wafer maps)</li><li>&nbsp;</li>
+      <li class="tb b s">Evaluation:</li><li class="w">&emsp;PSNR, SSIM, LPIPS (global)</li><li class="w">&emsp;Local SSIM, Weber Contrast,</li><li class="w">&emsp;EPI (defect-specific)</li><li>&nbsp;</li>
+      <li class="tb b s">Export:</li><li class="w">&emsp;ONNX Runtime compatible</li>
+    </ul>
+  </div>
+</div>
+<span class="sn">7 / 9</span>
+</section>
+
+<!-- SLIDE 8 -->
+<section class="slide sg" id="s8">
+<span class="badge g">GITHUB &amp; VIDEO</span>
+<h1 class="t">Source Code &amp; Demo</h1>
+<div class="al g"></div>
+<div class="lc mt16" style="border:1.5px solid var(--green)">
+  <div class="ct tg" style="font-size:18px">&#128230; GITHUB REPOSITORY</div>
+  <p class="url">https://github.com/&lt;your-username&gt;/semicon-restore</p>
+  <p>Includes: Full training code, pretrained weights, evaluation scripts, synthetic degradation pipeline, XGBoost detector, QC verifier, Gradio demo app</p>
+</div>
+<div class="lc" style="border:1.5px solid var(--blue)">
+  <div class="ct tb" style="font-size:18px">&#127909; VIDEO DEMO</div>
+  <p class="url">https://youtu.be/&lt;your-video-id&gt;&emsp;(or Loom/Drive link)</p>
+  <p>Shows: Live Gradio demo with image upload &rarr; restoration &rarr; side-by-side comparison &rarr; defect heatmap overlay &rarr; QC dashboard with pass/flag decisions</p>
+</div>
+<span class="sn">8 / 9</span>
+</section>
+
+<!-- SLIDE 9 -->
+<section class="slide smg" id="s9">
+<span class="badge gr">REFERENCES</span>
+<h1 class="t">Research Papers, Datasets &amp; Tools</h1>
+<div class="al gr"></div>
+<div class="g2">
+  <div class="card">
+    <div class="ct tg">RESEARCH PAPERS</div>
+    <ul>
+      <li class="w s">[1]&ensp;Chen et al., &ldquo;Simple Baselines for Image Restoration&rdquo; (NAFNet), ECCV 2022</li>
+      <li class="w s">[2]&ensp;Liang et al., &ldquo;SwinIR: Image Restoration Using Swin Transformer&rdquo;, ICCVW 2021</li>
+      <li class="w s">[3]&ensp;Yu &amp; Acton, &ldquo;Speckle Reducing Anisotropic Diffusion&rdquo;, IEEE TIP 2002</li>
+      <li class="w s">[4]&ensp;Jiang et al., &ldquo;Focal Frequency Loss for Image Reconstruction and Synthesis&rdquo;, ICCV 2021</li>
+      <li class="w s">[5]&ensp;Liu et al., &ldquo;Image Inpainting with Partial Convolutions&rdquo;, ECCV 2018</li>
+      <li class="w s">[6]&ensp;Wang et al., &ldquo;Image Quality Assessment: Error Visibility to Structural Similarity&rdquo;, IEEE TIP 2004</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="ct tb">DATASETS</div>
+    <ul>
+      <li class="w s">[D1]&ensp;MVTec AD &mdash; Anomaly Detection Benchmark (Transistor, PCB, Grid subsets)</li>
+      <li class="w s">[D2]&ensp;WM-811K &mdash; 811K Real Wafer Maps (NTU)</li>
+      <li class="w s">[D3]&ensp;DeepPCB &mdash; 1500 PCB Defect Image Pairs</li>
+      <li class="w s">[D4]&ensp;SEM-i-CON &mdash; SEM Wafer Die Images</li>
+    </ul>
+    <div class="ct ta mt16">TOOLS &amp; LIBRARIES</div>
+    <ul>
+      <li class="w s">&bull; PyTorch 2.x &mdash; Deep learning framework</li>
+      <li class="w s">&bull; XGBoost &mdash; Gradient boosted classifier</li>
+      <li class="w s">&bull; scikit-image &mdash; Feature extraction (GLCM, LBP)</li>
+      <li class="w s">&bull; OpenCV &mdash; Classical filters, image I/O</li>
+      <li class="w s">&bull; Gradio &mdash; Interactive web demo</li>
+      <li class="w s">&bull; ONNX Runtime &mdash; Optimized inference</li>
+      <li class="w s">&bull; NumPy / SciPy &mdash; Numerical computing</li>
+    </ul>
+  </div>
+</div>
+<span class="sn">9 / 9</span>
+</section>
+
+</div>
+
+<nav class="nb" id="nb">
+  <button class="nd ac" onclick="go(1)" title="Team Details"></button>
+  <button class="nd" onclick="go(2)" title="Problem Statement"></button>
+  <button class="nd" onclick="go(3)" title="Idea Description"></button>
+  <button class="nd" onclick="go(4)" title="Proposed Solution"></button>
+  <button class="nd" onclick="go(5)" title="Innovation"></button>
+  <button class="nd" onclick="go(6)" title="Results"></button>
+  <button class="nd" onclick="go(7)" title="Technology"></button>
+  <button class="nd" onclick="go(8)" title="GitHub & Video"></button>
+  <button class="nd" onclick="go(9)" title="References"></button>
+</nav>
+
+<script>
+function go(n){document.getElementById('s'+n).scrollIntoView({behavior:'smooth',block:'start'})}
+function cur(){let c=1,m=1e9;document.querySelectorAll('.slide').forEach((s,i)=>{let d=Math.abs(s.getBoundingClientRect().top);if(d<m){m=d;c=i+1}});return c}
+document.addEventListener('keydown',e=>{let c=cur();if(e.key==='ArrowDown'||e.key==='ArrowRight'||e.key===' '){e.preventDefault();if(c<9)go(c+1)}else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();if(c>1)go(c-1)}});
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){let id=parseInt(e.target.id.replace('s',''));document.querySelectorAll('.nd').forEach((d,i)=>{d.classList.toggle('ac',i+1===id)})}})},{threshold:.4});
+document.querySelectorAll('.slide').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.egg-info/
+dist/
+build/
+.env
+wandb/
+checkpoints/
+*.pt
+*.pth
+!weights/*.pt
+data/raw/
+*.npy
+outputs/*
+!outputs/.gitkeep
