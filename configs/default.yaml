@@ -28,7 +28,7 @@ training:
   num_workers: 2
 
 data:
-  train_degraded: Train/Degraded
-  train_gt: Train/Ground_Truth
-  test_in_dist: Test/Test_NoisyLR/In_Distribution
-  test_ood: Test/Test_NoisyLR/Out_of_Distribution
+  train_degraded: train/NoisyLR
+  train_gt: train/GT
+  test_lr: test/NoisyLR
+  test_gt: test/GT
