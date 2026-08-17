@@ -9,21 +9,12 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, Subset
 from torch.cuda.amp import GradScaler, autocast
 
-# Assuming these modules exist in the project structure
-try:
-    from data.dataset import KLAImageDataset
-    from models.nafnet_sr import build_model
-    from models.losses import CompositeLoss
-except ImportError:
-    print("Warning: Custom modules not found. Ensure data and models directories exist in the python path.")
-    # Placeholder classes for structural completeness if running outside full repo
-    class KLAImageDataset(torch.utils.data.Dataset):
-        def __init__(self, data_dir, is_train=True): pass
-        def __len__(self): return 100
-        def __getitem__(self, idx): return torch.randn(1, 64, 64), torch.randn(1, 128, 128)
-    def build_model(config): return nn.Identity()
-    class CompositeLoss(nn.Module):
-        def forward(self, pred, target): return torch.mean((pred - target)**2)
+# Import project modules — these require __init__.py in data/ and models/
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from data.dataset import PairedDataset
+from models.nafnet_sr import build_model
+from models.losses import CompositeLoss
 
 # Utility to compute metrics
 def compute_psnr(pred, target, data_range=1.0):
@@ -64,7 +55,7 @@ class InfiniteSampler(torch.utils.data.Sampler):
 
 def main():
     parser = argparse.ArgumentParser(description='Train NAFNet-Tiny for semicon restoration')
-    parser.add_argument('--config', type=str, default='configs/nafnet_tiny.yml', help='Path to config yaml')
+    parser.add_argument('--config', type=str, default='configs/default.yaml', help='Path to config yaml')
     parser.add_argument('--data_dir', type=str, required=True, help='Root directory of KLA dataset')
     parser.add_argument('--save_dir', type=str, default='checkpoints', help='Directory to save checkpoints')
     parser.add_argument('--resume', type=str, default=None, help='Path to checkpoint to resume from')
@@ -91,14 +82,16 @@ def main():
             }
         }
 
-    train_cfg = config.get('train', {})
+    train_cfg = config.get('training', config.get('train', {}))
+    data_cfg = config.get('data', {})
     lr = float(train_cfg.get('lr', 1e-3))
     warmup_iters = int(train_cfg.get('warmup_iters', 1000))
-    max_iters = args.max_iters if args.max_iters else int(train_cfg.get('max_iters', 50000))
-    val_interval = int(train_cfg.get('val_interval', 1000))
-    save_interval = int(train_cfg.get('save_interval', 5000))
-    batch_size = int(train_cfg.get('batch_size', 16))
-    num_workers = int(train_cfg.get('num_workers', 4))
+    max_iters = args.max_iters if args.max_iters else int(train_cfg.get('max_iters', 15000))
+    val_interval = int(train_cfg.get('val_interval', 500))
+    save_interval = int(train_cfg.get('save_interval', 1000))
+    batch_size = int(train_cfg.get('batch_size', 8))
+    num_workers = int(train_cfg.get('num_workers', 2))
+    lr_patch_size = int(train_cfg.get('lr_patch_size', 64))
 
     os.makedirs(args.save_dir, exist_ok=True)
 
@@ -106,7 +99,13 @@ def main():
     print(f"Using device: {device}")
 
     # Dataset & Dataloader
-    full_dataset = KLAImageDataset(args.data_dir, is_train=True)
+    # Resolve input/target dirs from config (relative to data_dir) or defaults
+    train_degraded = data_cfg.get('train_degraded', 'train/NoisyLR')
+    train_gt = data_cfg.get('train_gt', 'train/GT')
+    input_dir = os.path.join(args.data_dir, train_degraded)
+    target_dir = os.path.join(args.data_dir, train_gt)
+    print(f"Loading data from: {input_dir} -> {target_dir}")
+    full_dataset = PairedDataset(input_dir, target_dir, lr_patch_size=lr_patch_size, is_train=True)
     num_val = max(1, int(0.1 * len(full_dataset)))
     num_train = len(full_dataset) - num_val
     
