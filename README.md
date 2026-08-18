@@ -12,7 +12,7 @@ Our solution jointly performs denoising and 2x Super-Resolution using a Charbonn
 ### Key Stats:
 - **Parameters:** 0.48M (Extremely lightweight)
 - **Inference Speed:** < 3ms per image on GPU
-- **Model Size:** ~2MB
+- **Model Size:** ~5MB
 
 ## 🚀 Quick Start
 
