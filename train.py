@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Subset
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 
 # Import project modules — these require __init__.py in data/ and models/
 import sys
@@ -152,7 +152,7 @@ def main():
             return 0.5 * (1.0 + math.cos(math.pi * progress))
             
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
-    scaler = GradScaler()
+    scaler = GradScaler('cuda')
 
     start_iter = 1
     best_psnr = 0.0
@@ -185,7 +185,7 @@ def main():
 
         optimizer.zero_grad()
         
-        with autocast():
+        with autocast('cuda'):
             pred = model(degraded)
             loss = criterion(pred, target)
             
@@ -197,7 +197,7 @@ def main():
         
         scaler.step(optimizer)
         scaler.update()
-        scheduler.step()
+        scheduler.step()  # Correct: after optimizer.step()
 
         # Validation & Logging
         if current_iter % val_interval == 0 or current_iter == max_iters:
