@@ -1,6 +1,6 @@
 # AI-Based Restoration of Degraded Images for Semiconductor Inspection
 
-**Team:** Semigone | Semicon India Hackathon 2025
+**Team:** Semigone | Semicon India Hackathon 2026
 
 ## 📌 Problem
 Noisy, low-resolution Scanning Electron Microscope (SEM) images degrade semiconductor yield inspection processes, making it difficult to accurately detect defects.
